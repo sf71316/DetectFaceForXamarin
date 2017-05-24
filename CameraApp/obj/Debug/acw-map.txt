@@ -1,0 +1,8 @@
+CameraApp.MainActivity, CameraApp;md52e8fe95a97739bd9b4471832a0fd6871.MainActivity
+CameraApp.MainActivity, CameraApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null;md52e8fe95a97739bd9b4471832a0fd6871.MainActivity
+CameraApp.MainActivity;md52e8fe95a97739bd9b4471832a0fd6871.MainActivity
+cameraapp.MainActivity;md52e8fe95a97739bd9b4471832a0fd6871.MainActivity
+CameraApp.DetectTask, CameraApp;md52e8fe95a97739bd9b4471832a0fd6871.DetectTask
+CameraApp.DetectTask, CameraApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null;md52e8fe95a97739bd9b4471832a0fd6871.DetectTask
+CameraApp.DetectTask;md52e8fe95a97739bd9b4471832a0fd6871.DetectTask
+cameraapp.DetectTask;md52e8fe95a97739bd9b4471832a0fd6871.DetectTask
