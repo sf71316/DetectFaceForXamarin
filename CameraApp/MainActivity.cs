@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using Java.IO;
 using Android.Runtime;
 using Android.Graphics;
-using System.IO;
 using Android;
 using System.Threading.Tasks;
 using System.Linq;
@@ -17,6 +16,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using static Android.Provider.MediaStore;
+using System.IO;
 
 namespace CameraApp
 {
@@ -53,11 +53,9 @@ namespace CameraApp
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            //var _result = await this.AnalyzePictureAsync(inputStream);
             new DetectTask(this).Execute(inputStream);
-            
-        }
 
+        }
         private void TakeAPicture(object sender, EventArgs e)
         {
             var intent = new Intent(MediaStore.ActionImageCapture);
@@ -76,14 +74,13 @@ namespace CameraApp
             if (requestCode == CAMERA_CODE && resultCode == Android.App.Result.Ok)
             {
                 var photo = data.Extras.Get("data") as Bitmap;
-                var ss = data.Extras.ToArray<string>();
-                _imageView.SetImageBitmap(photo);
                 byte[] bitmapdata;
                 using (var stream = new MemoryStream())
                 {
                     var resized = Bitmap.CreateScaledBitmap(photo, 1980, 1080, true);
                     resized.Compress(Bitmap.CompressFormat.Jpeg, 100, stream);
                     bitmapdata = stream.ToArray();
+                    _imageView.SetImageBitmap(resized);
                 }
                 inputStream = new MemoryStream(bitmapdata);
             }
