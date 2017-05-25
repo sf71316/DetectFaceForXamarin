@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using static Android.Provider.MediaStore;
 using System.IO;
+using Android.Database;
 
 namespace CameraApp
 {
@@ -25,7 +26,7 @@ namespace CameraApp
     public class MainActivity : Activity
     {
         ImageView _imageView;
-        int CAMERA_CODE = 1000, CAMERA_REQUEST = 1001, INTERNET_REQUEST = 1002;
+        int CAMERA_CODE = 1000, CAMERA_REQUEST = 1001, INTERNET_REQUEST = 1002, SD_REQUEST = 1003;
         Stream inputStream;
         //private VisionServiceClient visionClient;
         protected override void OnCreate(Bundle bundle)
@@ -41,6 +42,11 @@ namespace CameraApp
             {
                 RequestPermissions(new string[] { Manifest.Permission.Internet }, INTERNET_REQUEST);
             }
+            //if (CheckSelfPermission(Manifest.Permission.ReadExternalStorage) == Permission.Denied ||
+            //    CheckSelfPermission(Manifest.Permission.WriteExternalStorage) == Permission.Denied)
+            //{
+            //    RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.WriteExternalStorage }, SD_REQUEST);
+            //}
             if (IsThereAnAppToTakePictures())
             {
                 Button button = FindViewById<Button>(Resource.Id.button1);
@@ -77,11 +83,29 @@ namespace CameraApp
                 byte[] bitmapdata;
                 using (var stream = new MemoryStream())
                 {
-                    var resized = Bitmap.CreateScaledBitmap(photo, 1980, 1080, true);
+                    int _width = 1920;
+                    int _height = 1080;
+                    if (photo.Width < photo.Height)
+                    {
+                        _width += _height;//1920+1080
+                        _height = _width - _height;//(1920+1080)-1080
+                        _width = _width - _height;//(1920+1080)-(1920+1080)-1080
+                    }
+                    var resized = Bitmap.CreateScaledBitmap(photo, _width, _height, true);
                     resized.Compress(Bitmap.CompressFormat.Jpeg, 100, stream);
                     bitmapdata = stream.ToArray();
-                    _imageView.SetImageBitmap(resized);
+                    _imageView.SetImageBitmap(photo);
                 }
+                var _path = getRealPathFromURI(data.Data);
+                if (_path.Contains(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath))
+                {
+
+                }
+                //if (System.IO.File.Exists(_path))
+                //{
+                //    System.IO.File.Delete(_path);
+                //}
+
                 inputStream = new MemoryStream(bitmapdata);
             }
 
@@ -94,10 +118,21 @@ namespace CameraApp
                 if (grantResults[0] == Permission.Granted)
                     Toast.MakeText(this, "Permission Granted", ToastLength.Short).Show();
                 else
-                    Toast.MakeText(this, "Permission Deind", ToastLength.Short).Show();
+                    Toast.MakeText(this, "Permission Deind", ToastLength.Long).Show();
 
             }
 
+        }
+
+        public String getRealPathFromURI(Android.Net.Uri contentUri)
+        {
+            var mediaStoreImagesMediaData = "_data";
+            string[] projection = { mediaStoreImagesMediaData };
+            Android.Database.ICursor cursor = this.ContentResolver.Query(contentUri, projection,
+                                                                null, null, null);
+            int columnIndex = cursor.GetColumnIndexOrThrow(mediaStoreImagesMediaData);
+            cursor.MoveToFirst();
+            return cursor.GetString(columnIndex);
         }
 
     }
@@ -141,7 +176,11 @@ namespace CameraApp
                 response = await client.PostAsync(uri, content);
                 return await response.Content.ReadAsStringAsync();
             }
+
         }
+
+
+
 
         protected override void OnPreExecute()
         {
